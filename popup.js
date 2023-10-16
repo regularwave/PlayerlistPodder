@@ -36,7 +36,12 @@ function podOvrd() {
 
         wpageelement.parentNode.insertBefore(ntndiv, wpageelement);
     }
-    wizTabHeader = document.querySelector('.registered-player-list__tabel-action-column');
+    if (document.body.contains(document.querySelector(".registered-player-list__tabel-action-column"))) {
+        wizTabHeader = document.querySelector('.registered-player-list__tabel-action-column');
+        console.log("WotC: fix your typo!");
+    } else {
+        wizTabHeader = document.querySelector('.registered-player-list__table-action-column');
+    }
     const ntnoverridenumheader = document.createElement("span");
     ntnoverridenumheader.classList.add('playerlistpodderpodoverrideheader');
     ntnoverridenumheader.textContent = "Pod Override";
@@ -113,7 +118,7 @@ function genPods() {
         indexPos += 4;
     }
     const gameDate = new Date().toISOString();
-    const titleText = `Commander Pods ${gameDate.split('T')[0]}`;
+    const titleText = `Playerlist Pods ${gameDate.split('T')[0]}`;
     let prettyPods = `<!DOCTYPE html>
         <html>
             <head>
