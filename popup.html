@@ -4,11 +4,72 @@
 <head>
     <title>Playerlist Podder</title>
     <script src="popup.js"></script>
+    <style>
+        body {
+            display: flex;
+        }
+
+        .titlecontainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .settingscontainer {
+            flex-direction: column;
+        }
+
+        .child {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .childcolforce {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+
+        .non4prefradiocontainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+    </style>
 </head>
 
 <body>
-    <button id="podOvrdButton">Pod overrides</button>
-    <button id="genPodsButton">Generate pods</button>
+    <div class="settingscontainer">
+        <div class="titlecontainer">Playerlist Podder</div>
+        <div class="child">
+            <span>Report text:</span>
+        </div>
+        <div class="child">
+            <input type="text" id="podReportHeader" value="Playerlist Pods">
+        </div>
+        <div class="child">
+            <div class="childcolforce">
+                <span>Non-4 pref:</span>
+                <div class="non4prefradiocontainer">
+                    <div>
+                        <input type="radio" name="podSizePref" id="prefThrees" checked>
+                        <label for="prefThrees">3s</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="podSizePref" id="prefFives">
+                        <label for="prefFives">5s</label>
+                    </div>
+                </div>
+            </div>
+            <div class="childcolforce">
+                <span>Seats: </span><input type="number" name="maxSeats" id="maxSeats" min="4" value="28" size="10">
+            </div>
+        </div>
+        <div class="child">
+            <button id="podOvrdButton">Show overrides</button><button id="genPodsButton">Generate pods</button>
+        </div>
+    </div>
 </body>
 
 </html>

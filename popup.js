@@ -1,11 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("genPodsButton").addEventListener("click", () => {
+        let preferPodOverflow = 3;
+        if (document.getElementById("prefThrees").checked) {
+            preferPodOverflow = 3;
+        } else if (document.getElementById("prefFives").checked) {
+            preferPodOverflow = 5;
+        }
+        let maxFourSeats = document.getElementById("maxSeats").valueAsNumber;
+        let reportHeader = document.getElementById("podReportHeader").value;
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const activeTab = tabs[0];
             const tabId = activeTab.id;
             chrome.scripting.executeScript({
                 target: { tabId },
                 function: genPods,
+                args: [preferPodOverflow, maxFourSeats, reportHeader]
             });
         });
     });
@@ -26,14 +35,12 @@ function podOvrd() {
     for (const wpageelement of wizTabNumElements) {
         const ntndiv = document.createElement("div");
         ntndiv.classList.add('playerlistpodderoverridecontainer');
-
         const ntnoverridenuminput = document.createElement("input");
         ntnoverridenuminput.classList.add('playerlistpodderoverrideinput');
         ntnoverridenuminput.type = "number";
         ntnoverridenuminput.setAttribute("min", "0");
         ntnoverridenuminput.value = "0";
         ntndiv.appendChild(ntnoverridenuminput);
-
         wpageelement.parentNode.insertBefore(ntndiv, wpageelement);
     }
     if (document.body.contains(document.querySelector(".registered-player-list__tabel-action-column"))) {
@@ -45,12 +52,10 @@ function podOvrd() {
     const ntnoverridenumheader = document.createElement("span");
     ntnoverridenumheader.classList.add('playerlistpodderpodoverrideheader');
     ntnoverridenumheader.textContent = "Pod Override";
-
     wizTabHeader.parentNode.insertBefore(ntnoverridenumheader, wizTabHeader);
-
 }
 
-function genPods() {
+function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
     var namearray = [];
     document.querySelectorAll('input.editable-text__input').forEach(pname => {
         namearray.push(pname.value)
@@ -83,19 +88,32 @@ function genPods() {
         case numPlayers % 4 === 0:
             podSizes["fours"] = Math.floor(numPlayers / 4);
             break;
-        case [3, 6, 9].includes(numPlayers):
+        case [3, 6].includes(numPlayers):
             podSizes["threes"] = Math.floor(numPlayers / 3);
             break;
         case numPlayers === 5:
             podSizes["fives"] = 1;
             break;
-        case numPlayers > 28:
-            podSizes["fives"] = numPlayers - 28;
-            podSizes["fours"] = 7 - podSizes["fives"];
+        case numPlayers === 9:
+            if (preferPodOverflow === 3) {
+                podSizes["threes"] = Math.floor(numPlayers / 3);
+            } else if (preferPodOverflow === 5) {
+                podSizes["fours"] = 1;
+                podSizes["fives"] = 1;
+            }
+            break;
+        case numPlayers > maxFourSeats:
+            podSizes["fives"] = numPlayers - maxFourSeats;
+            podSizes["fours"] = (maxFourSeats / 4) - podSizes["fives"];
             break;
         default:
-            podSizes["threes"] = 4 - (numPlayers % 4);
-            podSizes["fours"] = Math.floor((numPlayers - podSizes["threes"] * 3) / 4);
+            if (preferPodOverflow === 3) {
+                podSizes["threes"] = 4 - (numPlayers % 4);
+                podSizes["fours"] = Math.floor((numPlayers - podSizes["threes"] * 3) / 4);
+            } else if (preferPodOverflow === 5) {
+                podSizes["fives"] = numPlayers % 4;
+                podSizes["fours"] = Math.floor((numPlayers - podSizes["fives"] * 5) / 4);
+            }
     }
     let indexPos = 0;
     let podNumber = 1;
@@ -118,7 +136,7 @@ function genPods() {
         indexPos += 4;
     }
     const gameDate = new Date().toISOString();
-    const titleText = `Playerlist Pods ${gameDate.split('T')[0]}`;
+    const titleText = `${reportHeader} ${gameDate.split('T')[0]}`;
     let prettyPods = `<!DOCTYPE html>
         <html>
             <head>
@@ -161,8 +179,6 @@ function genPods() {
         }
     });
     prettyPods += `${htmlRows}</body></html>`;
-    const blob = new Blob([prettyPods], { type: "text/html" });
-    // const url = URL.createObjectURL(blob);
     const win = window.open();
     win.document.write(prettyPods);
 }
