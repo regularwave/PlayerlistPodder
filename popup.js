@@ -94,6 +94,10 @@ function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
         case numPlayers === 5:
             podSizes["fives"] = 1;
             break;
+        case numPlayers === 7:
+            podSizes["threes"] = 1;
+            podSizes["fours"] = 1;
+            break;
         case numPlayers === 9:
             if (preferPodOverflow === 3) {
                 podSizes["threes"] = Math.floor(numPlayers / 3);
@@ -101,6 +105,10 @@ function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
                 podSizes["fours"] = 1;
                 podSizes["fives"] = 1;
             }
+            break;
+        case numPlayers === 11:
+            podSizes["threes"] = 1;
+            podSizes["fours"] = 2;
             break;
         case numPlayers > maxFourSeats:
             podSizes["fives"] = numPlayers - maxFourSeats;
