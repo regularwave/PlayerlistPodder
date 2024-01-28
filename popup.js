@@ -143,8 +143,8 @@ function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
         podNumber++;
         indexPos += 4;
     }
-    const gameDate = new Date().toISOString();
-    const titleText = `${reportHeader} ${gameDate.split('T')[0]}`;
+    const gameDate = new Date();
+    const titleText = `${reportHeader} ${gameDate.getFullYear() + ('0' + (gameDate.getMonth() + 1)).slice(-2) + ('0' + (gameDate.getDate())).slice(-2)}`;
     let prettyPods = `<!DOCTYPE html>
         <html>
             <head>
