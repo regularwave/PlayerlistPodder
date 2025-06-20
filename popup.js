@@ -56,11 +56,27 @@ function podOvrd() {
 }
 
 function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
-    var namearray = [];
-    document.querySelectorAll('input.editable-text__input').forEach(pname => {
-        namearray.push(pname.value)
+
+    var lnamearray = [];
+    var fnamearray = [];
+
+    // var namearray = [];
+
+    document.querySelectorAll('div.editable-text.registered-player__last-name > div > div > input[type=text]').forEach(tlname => {
+        lnamearray.push(tlname.value)
     });
-    const pfullnamelist = Array.from({ length: (namearray.length) / 2 }, (_, i) => namearray[2 * i] + " " + namearray[2 * i + 1]);
+    document.querySelectorAll('div.editable-text.registered-player__first-name > div > div > input[type=text]').forEach(tfname => {
+        fnamearray.push(tfname.value)
+    });
+
+    // document.querySelectorAll('input.editable-text__input').forEach(pname => {
+    //     namearray.push(pname.value)
+    // });
+
+    const pfullnamelist = Array.from({ length: lnamearray.length }, (_, i) => lnamearray[i] + " " + fnamearray[i]);
+
+    // const pfullnamelist = Array.from({ length: (namearray.length) / 2 }, (_, i) => namearray[2 * i] + " " + namearray[2 * i + 1]);
+
     var tablearray = [];
     if (document.body.contains(document.querySelector(".playerlistpodderoverrideinput"))) {
         document.querySelectorAll('.playerlistpodderoverrideinput').forEach(tnum => {
