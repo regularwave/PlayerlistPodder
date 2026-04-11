@@ -1,0 +1,27 @@
+name: Build and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Zip Extension Files
+        run: |
+          zip -r playerlist-podder-${{ github.ref_name }}.zip manifest.json sidepanel.html sidepanel.js background.js images/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: playerlist-podder-${{ github.ref_name }}.zip
+          generate_release_notes: true
