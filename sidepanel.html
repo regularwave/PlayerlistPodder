@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Playerlist Podder</title>
+    <script src="sidepanel.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Beleren';
+            src: url('https://cdn.jsdelivr.net/npm/@regularwave/beleren-bold-woff2/beleren-bold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        :root {
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --bg: #111827;
+            --surface: #1f2937;
+            --text: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --radius: 8px;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            font-family: 'Beleren', system-ui, sans-serif;
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .header img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-family: 'Beleren', system-ui, sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #374151;
+            color: var(--text);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary);
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            background: var(--bg);
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Beleren', system-ui, sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-family: 'Beleren', system-ui, sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #374151;
+        }
+
+        .icon-btn {
+            width: 42px;
+            padding: 0;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+        }
+
+        .icon-btn:hover {
+            color: #ef4444;
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .icon-btn svg {
+            transition: stroke 0.2s;
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        /* --- Footer Styles --- */
+        .footer {
+            margin-top: auto;
+            /* Pushes the footer to the bottom of the sidebar */
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .github-link:hover {
+            color: var(--text);
+        }
+
+        .legal-accordion {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .legal-accordion summary {
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+            text-align: center;
+            outline: none;
+            transition: color 0.2s;
+        }
+
+        .legal-accordion summary:hover {
+            color: var(--text);
+        }
+
+        .legal-accordion .content {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: var(--surface);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            text-align: justify;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <img src="images/icon32.png" alt="icon">
+        Playerlist Podder
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <label for="podReportHeader">Pod Report Header</label>
+            <input type="text" id="podReportHeader" value="Playerlist Pods">
+        </div>
+
+        <div class="row">
+            <div class="input-group col">
+                <label>Non-4 Pref</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="podSizePref" id="prefThrees" checked> 3s
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="podSizePref" id="prefFives"> 5s
+                    </label>
+                </div>
+            </div>
+            <div class="input-group col">
+                <label for="maxSeats">Total Seats</label>
+                <input type="number" id="maxSeats" min="4" value="28">
+            </div>
+        </div>
+    </div>
+
+    <div class="action-group">
+        <div class="row">
+            <button id="podOvrdButton" class="btn-secondary col">Show Pod & cEDH Overrides</button>
+            <button id="clearOvrdButton" class="btn-secondary icon-btn" title="Clear all overrides">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
+                    <path d="M22 21H7" />
+                    <path d="m5 11 9 9" />
+                </svg>
+            </button>
+        </div>
+        <button id="genPodsButton">Generate Pods</button>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/regularwave/PlayerlistPodder" target="_blank" class="github-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            View Project on GitHub
+        </a>
+
+        <details class="legal-accordion">
+            <summary>Fan Content Policy</summary>
+            <div class="content">
+                Playerlist Podder is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. &copy;Wizards of the Coast LLC.
+            </div>
+        </details>
+    </div>
+</body>
+
+</html>

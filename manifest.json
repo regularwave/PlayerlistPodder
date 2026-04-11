@@ -1,10 +1,24 @@
 {
     "manifest_version": 3,
     "name": "Playerlist Podder",
-    "version": "0.2",
-    "description": "Creates pods for playerlist only events",
+    "version": "2.0",
+    "description": "Creates Commander pods for playerlist-only events. Supports separate cEDH pods.",
+    "permissions": [
+        "scripting",
+        "sidePanel",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://eventlink.wizards.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    },
     "action": {
-        "default_popup": "popup.html",
+        "default_title": "Open Playerlist Podder",
         "default_icon": {
             "16": "images/icon16.png",
             "48": "images/icon48.png",
@@ -15,19 +29,5 @@
         "16": "images/icon16.png",
         "48": "images/icon48.png",
         "128": "images/icon128.png"
-    },
-    "permissions": [
-        "activeTab",
-        "scripting"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content.js"
-            ]
-        }
-    ]
+    }
 }
