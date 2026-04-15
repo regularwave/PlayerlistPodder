@@ -82,7 +82,6 @@ function clearOvrd() {
 }
 
 function podOvrd() {
-    // create a unique key for the current event based on URL
     const eventKey = 'playerlist_podder_' + window.location.pathname;
     let savedState = {};
     try {
@@ -91,8 +90,8 @@ function podOvrd() {
     } catch (e) { }
 
     const saveCurrentState = () => {
-        const lnameInputs = document.querySelectorAll('.registered-player__last-name input[type="text"]');
-        const fnameInputs = document.querySelectorAll('.registered-player__first-name input[type="text"]');
+        const lnameInputs = document.querySelectorAll('.registered-player__last-name input[type="text"], .standby-list__child__last-name input[type="text"]');
+        const fnameInputs = document.querySelectorAll('.registered-player__first-name input[type="text"], .standby-list__child__first-name input[type="text"]');
         const overrideInputs = document.querySelectorAll('.playerlistpodderoverrideinput');
         const cedhCheckboxes = document.querySelectorAll('.playerlistpoddercedhcheckbox');
 
@@ -109,13 +108,16 @@ function podOvrd() {
         sessionStorage.setItem(eventKey, JSON.stringify(stateToSave));
     };
 
-    let wizTabNumElements = document.querySelectorAll('.registered-player__tableNumber');
-    const lnameInputs = document.querySelectorAll('.registered-player__last-name input[type="text"]');
-    const fnameInputs = document.querySelectorAll('.registered-player__first-name input[type="text"]');
+    const uiAnchorSelector = '.registered-player__tableNumber, .standby-list__child__padding-action';
+    const fNameSelector = '.registered-player__first-name input[type="text"], .standby-list__child__first-name input[type="text"]';
+    const lNameSelector = '.registered-player__last-name input[type="text"], .standby-list__child__last-name input[type="text"]';
+
+    let injectionTargets = document.querySelectorAll(uiAnchorSelector);
+    const fnameInputs = document.querySelectorAll(fNameSelector);
+    const lnameInputs = document.querySelectorAll(lNameSelector);
 
     let index = 0;
-    for (const wpageelement of wizTabNumElements) {
-        // prevent duplicate table injection
+    for (const wpageelement of injectionTargets) {
         if (wpageelement.parentNode.querySelector('.playerlistpodderoverridecontainer')) {
             index++;
             continue;
@@ -125,16 +127,20 @@ function podOvrd() {
         let lName = lnameInputs[index] ? lnameInputs[index].value : "";
         let fullName = fName + " " + lName;
 
-        // revert to saved memory or default to 0/false
         let playerState = savedState[fullName] || { override: "0", cedh: false };
 
         const containerDiv = document.createElement("div");
         containerDiv.classList.add('playerlistpodderoverridecontainer');
         containerDiv.style.display = "flex";
-        containerDiv.style.flexDirection = "column";
+        containerDiv.style.flexDirection = "row";
         containerDiv.style.alignItems = "center";
         containerDiv.style.justifyContent = "center";
-        containerDiv.style.gap = "4px";
+        containerDiv.style.gap = "8px";
+
+        containerDiv.style.width = "110px";
+        containerDiv.style.minWidth = "110px";
+        containerDiv.style.flexShrink = "0";
+        containerDiv.style.margin = "0 8px";
 
         const numInput = document.createElement("input");
         numInput.classList.add('playerlistpodderoverrideinput');
@@ -169,23 +175,33 @@ function podOvrd() {
         index++;
     }
 
-    // header injection for our column
-    let wizTabHeader = document.querySelector('.registered-player-list__tabel-action-column') || document.querySelector('.registered-player-list__table-action-column');
+    let wizTabHeader = document.querySelector('.registered-player-list__tabel-action-column, .registered-player-list__table-action-column, .standby-list__tabel-action-column, .standby-list__table-action-column');
 
     if (wizTabHeader && !document.querySelector('.playerlistpodderpodoverrideheader')) {
-        const headerSpan = document.createElement("span");
-        headerSpan.classList.add('playerlistpodderpodoverrideheader');
-        headerSpan.innerHTML = "Pod/<br>cEDH";
-        headerSpan.style.textAlign = "center";
-        headerSpan.style.lineHeight = "1.2";
-        headerSpan.style.fontWeight = "bold";
-        wizTabHeader.parentNode.insertBefore(headerSpan, wizTabHeader);
+        const headerContainer = document.createElement("div");
+        headerContainer.classList.add('playerlistpodderpodoverrideheader');
+        headerContainer.innerHTML = "Pod/<br>cEDH";
+        headerContainer.style.display = "flex";
+        headerContainer.style.alignItems = "center";
+        headerContainer.style.justifyContent = "center";
+        headerContainer.style.textAlign = "center";
+        headerContainer.style.lineHeight = "1.2";
+        headerContainer.style.fontWeight = "bold";
+        headerContainer.style.width = "110px";
+        headerContainer.style.minWidth = "110px";
+        headerContainer.style.flexShrink = "0";
+        headerContainer.style.margin = "0 8px";
+
+        wizTabHeader.parentNode.insertBefore(headerContainer, wizTabHeader);
     }
 }
 
 function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
-    const lnames = Array.from(document.querySelectorAll('.registered-player__last-name input[type="text"]')).map(el => el.value);
-    const fnames = Array.from(document.querySelectorAll('.registered-player__first-name input[type="text"]')).map(el => el.value);
+    const fNameSelector = '.registered-player__first-name input[type="text"], .standby-list__child__first-name input[type="text"]';
+    const lNameSelector = '.registered-player__last-name input[type="text"], .standby-list__child__last-name input[type="text"]';
+
+    const fnames = Array.from(document.querySelectorAll(fNameSelector)).map(el => el.value);
+    const lnames = Array.from(document.querySelectorAll(lNameSelector)).map(el => el.value);
 
     const overrideInputs = document.querySelectorAll('.playerlistpodderoverrideinput');
     const cedhCheckboxes = document.querySelectorAll('.playerlistpoddercedhcheckbox');

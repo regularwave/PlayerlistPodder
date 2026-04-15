@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Playerlist Podder",
-    "version": "2.0",
+    "version": "2.1",
     "description": "Creates Commander pods for playerlist-only events. Supports separate cEDH pods.",
     "permissions": [
         "scripting",
