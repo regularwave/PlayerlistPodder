@@ -9,7 +9,7 @@ Playerlist Podder is a Chrome extension that will generate Commander pods for Ma
 
 1. Navigate to your event's registration page in EventLink (the page that shows the "Registered Players" and "Companion App Lobby" sections).
 2. Register players into the event as you normally would.
-3. Once all players are showing up in the "Registered Players" section, click the Playerlist Podder extension icon in your Chrome toolbar to open the side panel.
+3. Once all players are showing up in the "Registered Players" or "Standby List" section, click the Playerlist Podder extension icon in your Chrome toolbar to open the side panel.
 4. Configure your settings, apply any necessary overrides, and generate your pods!
 
 ## Features & Configuration

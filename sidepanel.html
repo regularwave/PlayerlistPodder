@@ -7,9 +7,11 @@
     <style>
         @font-face {
             font-family: 'Beleren';
-            src: url('https://cdn.jsdelivr.net/npm/@regularwave/beleren-bold-woff2/beleren-bold.woff2') format('woff2');
+            src: url('https://cdn.jsdelivr.net/npm/@regularwave/beleren-bold-woff2@latest/fonts/Beleren-Bold-w2.woff2') format('woff2');
             font-weight: bold;
             font-style: normal;
+            font-display: swap;
+            text-rendering: optimizeLegibility;
         }
 
         :root {
@@ -177,7 +179,48 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-top: 8px;
+        }
+
+        #statusContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-alert {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: var(--radius);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .status-alert strong {
+            color: #f87171;
+            font-family: 'Beleren', system-ui, sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-alert span {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .footer {
@@ -265,6 +308,8 @@
             </div>
         </div>
     </div>
+
+    <div id="statusContainer"></div>
 
     <div class="action-group">
         <div class="row">

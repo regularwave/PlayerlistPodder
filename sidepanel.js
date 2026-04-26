@@ -1,12 +1,37 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    // detect page changes
+    const runEventStateCheck = () => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (!tabs[0] || !tabs[0].url || !tabs[0].url.includes('eventlink.wizards.com')) {
+                document.getElementById('statusContainer').style.display = 'none';
+                lastStateStr = "";
+                return;
+            }
+
+            chrome.scripting.executeScript({
+                target: { tabId: tabs[0].id },
+                func: checkEventState,
+            }, (results) => {
+                if (results && results[0] && results[0].result) {
+                    updateStatusArea(results[0].result);
+                }
+            });
+        });
+    };
+
+    // run immediately on load, then check every 1.5 seconds
+    runEventStateCheck();
+    setInterval(runEventStateCheck, 1500);
+
+
     document.getElementById("genPodsButton").addEventListener("click", () => {
         let preferPodOverflow = document.getElementById("prefThrees").checked ? 3 : 5;
         let maxFourSeats = document.getElementById("maxSeats").valueAsNumber;
         let reportHeader = document.getElementById("podReportHeader").value;
 
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (!tabs[0]) return;
+            if (!tabs[0] || !tabs[0].url || !tabs[0].url.includes('eventlink.wizards.com')) return;
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
                 func: genPods,
@@ -17,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById("podOvrdButton").addEventListener("click", () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (!tabs[0]) return;
+            if (!tabs[0] || !tabs[0].url || !tabs[0].url.includes('eventlink.wizards.com')) return;
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
                 func: podOvrd,
@@ -27,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById("clearOvrdButton").addEventListener("click", () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (!tabs[0]) return;
+            if (!tabs[0] || !tabs[0].url || !tabs[0].url.includes('eventlink.wizards.com')) return;
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
                 func: clearOvrd,
@@ -67,7 +92,120 @@ document.addEventListener('DOMContentLoaded', function () {
     prefFives.addEventListener('change', saveSettings);
 }, false);
 
+let lastStateStr = "";
+
+// status area
+function updateStatusArea(state) {
+    const stateStr = JSON.stringify(state);
+    if (stateStr === lastStateStr) return;
+    lastStateStr = stateStr;
+    const container = document.getElementById('statusContainer');
+    let htmlContent = '';
+    let hasWarning = false;
+
+    if (state.lobbyCount > 0) {
+        hasWarning = true;
+        htmlContent += `
+            <div class="status-alert">
+                <strong>App Lobby Players Detected</strong>
+                <span>You have ${state.lobbyCount} player(s) still in the Companion App Lobby. Move them to the Standby/Registered list to include them in pods.</span>
+            </div>
+        `;
+    }
+
+    if (state.is2HG && state.teamCount > 0) {
+        hasWarning = true;
+        htmlContent += `
+            <div class="status-alert">
+                <strong>Registered Teams Detected</strong>
+                <span>You have ${state.teamCount} registered team(s). Playerlist Podder cannot see players in teams - use the EventLink 'Unregister Team' button to move them back to the Standby List.</span>
+            </div>
+        `;
+    }
+
+    container.innerHTML = htmlContent;
+    container.style.display = hasWarning ? 'flex' : 'none';
+}
+
+
 // inject functions
+function checkEventState() {
+    let lobbyCount = 0;
+    let teamCount = 0;
+    let is2HG = false;
+
+    // detect if this is a 2HG/Team layout
+    if (document.querySelector('.standby-list') || document.querySelector('.team-registration-body__teams')) {
+        is2HG = true;
+    }
+
+    // check the Companion Lobby count
+    const lobbyContainer = document.querySelector('.companion-lobby');
+    const lobbyAmountEl = document.querySelector('.companion-lobby__amounts strong');
+    if (lobbyAmountEl) {
+        lobbyCount = parseInt(lobbyAmountEl.innerText, 10) || 0;
+    }
+
+    // check the Registered Teams count
+    const teamsContainer = document.querySelector('.registered-team-list');
+    const teamsAmountEl = document.querySelector('.registered-team-list__header .counts');
+
+    if (teamsAmountEl) {
+        teamCount = parseInt(teamsAmountEl.innerText, 10) || 0;
+    } else if (document.querySelectorAll('.registered-team').length > 0) {
+        teamCount = document.querySelectorAll('.registered-team').length;
+    }
+
+    // inject CSS animation if it doesn't exist yet
+    if (!document.getElementById('playerlist-podder-pulse-css')) {
+        const style = document.createElement('style');
+        style.id = 'playerlist-podder-pulse-css';
+        style.innerHTML = `
+            @keyframes podderRedPulse {
+                0% { 
+                    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+                    background-color: rgba(239, 68, 68, 0.05);
+                }
+                50% {
+                    background-color: rgba(239, 68, 68, 0.18);
+                }
+                70% { 
+                    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); 
+                }
+                100% { 
+                    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                    background-color: rgba(239, 68, 68, 0.05);
+                }
+            }
+            .podder-warning-pulse {
+                animation: podderRedPulse 2s ease-in-out infinite !important;
+                border: 2px solid #ef4444 !important;
+                border-radius: 6px;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // pulse the teams container red if teams exist
+    if (teamsContainer) {
+        if (teamCount > 0) {
+            teamsContainer.classList.add('podder-warning-pulse');
+        } else {
+            teamsContainer.classList.remove('podder-warning-pulse');
+        }
+    }
+
+    // pulse the lobby container red if lobby players exist
+    if (lobbyContainer) {
+        if (lobbyCount > 0) {
+            lobbyContainer.classList.add('podder-warning-pulse');
+        } else {
+            lobbyContainer.classList.remove('podder-warning-pulse');
+        }
+    }
+
+    return { lobbyCount, teamCount, is2HG };
+}
 
 function clearOvrd() {
     const overrideInputs = document.querySelectorAll('.playerlistpodderoverrideinput');
@@ -136,7 +274,6 @@ function podOvrd() {
         containerDiv.style.alignItems = "center";
         containerDiv.style.justifyContent = "center";
         containerDiv.style.gap = "8px";
-
         containerDiv.style.width = "110px";
         containerDiv.style.minWidth = "110px";
         containerDiv.style.flexShrink = "0";
@@ -309,9 +446,11 @@ function genPods(preferPodOverflow, maxFourSeats, reportHeader) {
                 <style>
                     @font-face {
                         font-family: 'Beleren';
-                        src: url('https://cdn.jsdelivr.net/npm/@regularwave/beleren-bold-woff2/beleren-bold.woff2') format('woff2');
+                        src: url('https://cdn.jsdelivr.net/npm/@regularwave/beleren-bold-woff2@latest/fonts/Beleren-Bold-w2.woff2') format('woff2');
                         font-weight: bold;
                         font-style: normal;
+                        font-display: swap;
+                        text-rendering: optimizeLegibility;
                     }
                     body {
                         font-family: system-ui, -apple-system, sans-serif;
